@@ -1,0 +1,199 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block container %}
+    {% include 'includes/canteen_header.html' %}
+<div class="flex min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    {% include 'includes/canteen_nav.html' %}
+
+    <main class="flex-grow p-8">
+        <!-- Breadcrumbs -->
+        <nav class="mb-6 animate-fade-in">
+            <ol class="flex items-center space-x-2 text-sm font-medium text-gray-600 bg-white shadow-sm rounded-lg p-3 inline-block">
+                <li>
+                    <a href="{% url 'canteens:index' %}" class="flex items-center hover:text-blue-600 transition-colors duration-300">
+                        <i class="fas fa-tachometer-alt mr-2 text-gray-500"></i> Dashboard
+                    </a>
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-chevron-right mx-2 text-gray-400"></i>
+                    <a href="{% url 'canteens:canteen_students' %}" class="hover:text-blue-600 transition-colors duration-300">Students</a>
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-chevron-right mx-2 text-gray-400"></i>
+                    <span class="text-blue-600 font-semibold">Add Student</span>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Form Container -->
+        <div class="bg-white bg-opacity-95 backdrop-blur-md shadow-2xl rounded-xl p-8 space-y-8 animate-slide-up border border-gray-100">
+            <h4 class="text-3xl font-bold text-gray-900 mb-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-green-500 animate-gradient">Add New Student</h4>
+
+            <!-- Form Start -->
+            <form method="POST" enctype="multipart/form-data" class="space-y-8" id="studentForm">
+                {% csrf_token %}
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Student ID -->
+                    <div class="relative group">
+                        <label for="{{ form.student_id.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-blue-600">Student ID</label>
+                        {{ form.student_id }}
+                        {% if form.student_id.errors %}
+                            <p class="text-red-500 text-sm mt-1 animate-fade-in">{{ form.student_id.errors.as_text }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Student Name -->
+                    <div class="relative group">
+                        <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-blue-600">Student Name</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <p class="text-red-500 text-sm mt-1 animate-fade-in">{{ form.name.errors.as_text }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Parent Name -->
+                    <div class="relative group">
+                        <label for="{{ form.parent.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-blue-600">Parent Name</label>
+                        {{ form.parent }}
+                        {% if form.parent.errors %}
+                            <p class="text-red-500 text-sm mt-1 animate-fade-in">{{ form.parent.errors.as_text }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Parent Phone -->
+                    <div class="relative group">
+                        <label for="{{ form.parent_phone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-blue-600">Parent Phone</label>
+                        {{ form.parent_phone }}
+                        {% if form.parent_phone.errors %}
+                            <p class="text-red-500 text-sm mt-1 animate-fade-in">{{ form.parent_phone.errors.as_text }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- User Dropdown -->
+                    <div class="relative group">
+                        <label for="{{ form.user.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-blue-600">Assign User</label>
+                        {{ form.user }}
+                        {% if form.user.errors %}
+                            <p class="text-red-500 text-sm mt-1 animate-fade-in">{{ form.user.errors.as_text }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Balance -->
+                    <div class="relative group">
+                        <label for="{{ form.balance.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-blue-600">Initial Balance</label>
+                        {{ form.balance }}
+                        {% if form.balance.errors %}
+                            <p class="text-red-500 text-sm mt-1 animate-fade-in">{{ form.balance.errors.as_text }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Webcam Capture -->
+                    <div class="col-span-1 md:col-span-2 space-y-4">
+                        <label class="block text-sm font-medium text-gray-700">Face Image (Capture from Webcam)</label>
+                        <div class="flex flex-col items-center gap-4">
+                            <video id="video" width="320" height="240" autoplay class="rounded-lg border border-gray-300 shadow-sm"></video>
+                            <button type="button" id="capture" class="px-5 py-2.5 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 shadow-md transform hover:scale-105">
+                                <i class="fas fa-camera mr-2"></i> Capture Image
+                            </button>
+                            <div id="preview" class="mt-2 text-center">
+                                <p class="text-gray-500 text-sm italic">No image captured yet</p>
+                            </div>
+                            <canvas id="canvas" width="320" height="240" class="hidden"></canvas>
+                            <input type="hidden" name="face_image" id="face_image_data">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center">
+                    <button type="submit"
+                            class="mt-6 px-8 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:from-blue-600 hover:to-green-600 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-user-plus mr-2"></i> Add Student
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+<style>
+    /* Fade In Animation */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .animate-fade-in {
+        animation: fadeIn 1s ease-out forwards;
+    }
+
+    /* Slide Up Animation */
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-slide-up {
+        animation: slideUp 0.8s ease-out forwards;
+    }
+
+    /* Gradient Animation */
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .animate-gradient {
+        background-size: 200% 200%;
+        animation: gradient 5s ease infinite;
+    }
+
+    /* Form Input Styling */
+    input, select, textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        background: #f9fafb;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease-in-out;
+    }
+    input:focus, select:focus, textarea:focus {
+        border-color: #3b82f6;
+        background: #ffffff;
+        box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+        outline: none;
+    }
+</style>
+
+<script>
+    // Access webcam
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureButton = document.getElementById('capture');
+    const faceImageData = document.getElementById('face_image_data');
+    const preview = document.getElementById('preview');
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+        })
+        .catch(err => {
+            console.error("Error accessing webcam: ", err);
+            alert("Could not access webcam. Please ensure it is connected and permissions are granted.");
+        });
+
+    // Capture image from video
+    captureButton.addEventListener('click', () => {
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg');
+        
+        // Set the captured image data to the hidden input
+        faceImageData.value = dataUrl;
+
+        // Show preview with animation
+        preview.innerHTML = `<img src="${dataUrl}" alt="Captured Image" class="rounded-lg border border-gray-300 shadow-sm animate-fade-in" style="max-width: 320px;">`;
+    });
+</script>
+{% endblock %}

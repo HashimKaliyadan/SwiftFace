@@ -1,0 +1,110 @@
+{% extends "base/student_base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <!-- Background Particles -->
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="w-full h-full bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.05),transparent_70%)]"></div>
+    </div>
+
+    <div class="max-w-md w-full bg-white shadow-2xl rounded-xl p-8 border border-gray-200 relative z-10 transform hover:scale-105 transition-all duration-500">
+        <div class="text-center mb-8">
+            <h2 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-blue-600 animate-gradient">
+                Student Portal
+            </h2>
+            <p class="mt-2 text-sm text-gray-600">Securely access your account</p>
+        </div>
+
+        <form class="mt-8 space-y-6" method="POST">
+            {% csrf_token %}
+
+            <div class="space-y-6">
+                <!-- Email Field -->
+                <div class="relative group">
+                    <label for="email-address" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-green-600">Email Address</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400 group-focus-within:text-green-600 transition-colors duration-300"></i>
+                        </div>
+                        <input id="email-address" name="email" type="email" autocomplete="email" required
+                               class="appearance-none block w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-green-500 transition-all duration-300 shadow-sm"
+                               placeholder="Enter your email">
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="relative group">
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-green-600">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400 group-focus-within:text-green-600 transition-colors duration-300"></i>
+                        </div>
+                        <input id="password" name="password" type="password" autocomplete="current-password" required
+                               class="appearance-none block w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-green-500 transition-all duration-300 shadow-sm"
+                               placeholder="Enter your password">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <i class="fas fa-eye-slash text-gray-400 hover:text-gray-600 cursor-pointer transition-colors duration-300" id="togglePassword"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div class="text-sm">
+                    <a href="#" class="font-medium text-green-600 hover:text-green-500 transition-colors duration-200">Forgot Password?</a>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div>
+                <button type="submit"
+                        class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-green-500 hover:from-green-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-300 transform hover:scale-105 shadow-md">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <i class="fas fa-sign-in-alt text-white/80 group-hover:text-white transition-colors duration-300"></i>
+                    </span>
+                    Sign In
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-6 text-center">
+            <a href="{% url 'students:home' %}" class="inline-block w-full py-3 px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 hover:text-gray-900 transition-all duration-300 border border-gray-300 shadow-sm">Back to Home</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .animate-fade-in {
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .animate-gradient {
+        background-size: 200% 200%;
+        animation: gradient 5s ease infinite;
+    }
+</style>
+
+<script>
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#password');
+
+    togglePassword.addEventListener('click', function () {
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+</script>
+{% endblock %}

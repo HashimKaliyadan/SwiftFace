@@ -1,0 +1,76 @@
+{% load static %}
+
+    <header class="h-[80px] bg-white">
+        <section class="w-[90%] mx-auto h-full flex justify-between items-center">
+            <div>
+                <h1 class="text-green-600 text-2xl font-bold flex items-center">
+                    <i class="fas fa-rocket text-green-600 mr-2"></i>
+                    SwiftFace
+                </h1>
+            </div>
+
+            <div class="hidden md:block">
+                <ul class="flex justify-center space-x-8">
+                    <li>
+                        <a class="flex justify-start text-[18px] items-center hover:text-green-600 font-semibold" href="{% url 'students:home' %}">
+                            <i class="fas fa-home text-gray-600 mr-2"></i>
+                            Home
+                        </a>
+                    </li>
+                    {% if user.is_authenticated and user.is_student %}
+                        <li>
+                            <a class="flex justify-start text-[18px] items-center hover:text-green-600 font-semibold" href="{% url 'students:cart' %}">
+                                <i class="fas fa-shopping-cart text-gray-600 mr-2"></i>
+                                Cart
+                            </a>
+                        </li>
+                        <li>
+                            <a class="flex justify-start text-[18px] items-center hover:text-green-600 font-semibold" href="{% url 'students:wallet' %}">
+                                <i class="fas fa-wallet text-gray-600 mr-2"></i>
+                                Wallet
+                            </a>
+                        </li>
+                        <li>
+                            <a class="flex justify-start text-[18px] items-center hover:text-green-600 font-semibold" href="{% url 'students:logoutstudent' %}">
+                                <i class="fas fa-sign-out-alt text-gray-600 mr-2"></i>
+                                Logout
+                            </a>
+                        </li>
+                    {% elif user.is_authenticated and user.is_parent %}
+                        <li>
+                            <a class="flex justify-start text-[18px] items-center hover:text-green-600 font-semibold" href="{% url 'parents:dashboard' %}">
+                                <i class="fas fa-tachometer-alt text-gray-600 mr-2"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a class="flex justify-start text-[18px] items-center hover:text-green-600 font-semibold" href="{% url 'parents:parentlogout' %}">
+                                <i class="fas fa-sign-out-alt text-gray-600 mr-2"></i>
+                                Logout
+                            </a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a class="flex justify-start text-[18px] items-center hover:text-green-600 font-semibold" href="{% url 'students:loginstudent' %}">
+                                <i class="fas fa-user text-gray-600 mr-2"></i>
+                                Student Login
+                            </a>
+                        </li>
+                        <li>
+                            <a class="flex justify-start text-[18px] items-center hover:text-green-600 font-semibold" href="{% url 'parents:parentlogin' %}">
+                                <i class="fas fa-users text-gray-600 mr-2"></i>
+                                Parent Login
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            <div class="flex justify-end items-center space-x-4">
+                <a href="{% url 'canteens:login' %}" class="inline-flex items-center space-x-2 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-300">
+                    <i class="fas fa-utensils"></i>
+                    <span>Canteen</span>
+                </a>
+            </div>
+        </section>
+    </header>

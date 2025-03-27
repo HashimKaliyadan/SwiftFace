@@ -1,0 +1,160 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block container %}
+<div class="flex min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
+    <!-- Subtle Background Overlay -->
+    <div class="absolute inset-0 bg-pattern opacity-10 z-0"></div>
+
+    <main class="flex-grow p-8 flex items-center justify-center">
+        <div class="bg-white bg-opacity-95 backdrop-blur-md shadow-2xl rounded-2xl p-8 max-w-4xl w-full space-y-8 animate-slide-up border border-gray-100">
+            <!-- Header -->
+            <div class="text-center">
+                <h4 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-green-500 animate-gradient">Verify Your Identity</h4>
+                <p class="mt-2 text-gray-600">Total Amount: <span class="font-semibold text-green-600">${{ total|default:"0.00" }}</span></p>
+                <p class="mt-1 text-sm text-gray-500">Capture your face to complete the payment securely.</p>
+            </div>
+
+            <!-- Video and Preview Area (Horizontal Layout) -->
+            <div class="flex flex-row items-center justify-center space-x-6">
+                <!-- Video Feed with Overlay -->
+                <div class="relative w-[320px] h-[240px] rounded-lg overflow-hidden shadow-md border border-gray-200 animate-pulse-border flex-shrink-0">
+                    <video id="video" width="320" height="240" autoplay class="object-cover w-full h-full"></video>
+                    <!-- Face Scan Overlay -->
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <svg class="w-3/4 h-3/4 text-blue-500 opacity-20 animate-face-scan" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="10" y="10" width="80" height="80" rx="10" ry="10" class="animate-scan-line" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Canvas (Hidden) -->
+                <canvas id="canvas" width="320" height="240" class="hidden"></canvas>
+
+                <!-- Preview Area -->
+                <div id="preview" class="w-[320px] h-[240px] rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden transition-all duration-300 flex-shrink-0">
+                    <p class="text-gray-400 text-sm italic">Captured image will appear here</p>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <form method="POST" id="faceForm" class="space-y-4 w-full">
+                {% csrf_token %}
+                <input type="hidden" name="face_image" id="face_image_data">
+                <button type="button" id="capture" 
+                        class="w-full px-4 py-2 bg-blue-100 text-blue-700 font-semibold rounded-lg hover:bg-blue-200 hover:text-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 transform hover:scale-105 animate-bounce-in">
+                    <i class="fas fa-camera mr-2"></i> Capture Image
+                </button>
+                <button type="submit" id="submitBtn" 
+                        class="w-full px-8 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:from-blue-600 hover:to-green-600 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed animate-bounce-in delay-200" disabled>
+                    <i class="fas fa-check mr-2"></i> Confirm Payment
+                </button>
+            </form>
+
+            <!-- Messages -->
+            {% if messages %}
+                <div class="mt-4 space-y-2 animate-fade-in-up">
+                    {% for message in messages %}
+                        <p class="text-center text-sm font-medium {% if message.tags == 'error' %}text-red-500{% else %}text-green-500{% endif %}">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+
+<style>
+    /* Background Pattern */
+    .bg-pattern {
+        background: radial-gradient(circle, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    /* Animations */
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-slide-up {
+        animation: slideUp 0.8s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up {
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    @keyframes bounceIn {
+        0% { transform: scale(0.9); opacity: 0; }
+        60% { transform: scale(1.05); opacity: 1; }
+        100% { transform: scale(1); }
+    }
+    .animate-bounce-in {
+        animation: bounceIn 0.8s ease-out forwards;
+    }
+    .delay-200 { animation-delay: 200ms; }
+
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .animate-gradient {
+        background-size: 200% 200%;
+        animation: gradient 5s ease infinite;
+    }
+
+    @keyframes pulseBorder {
+        0% { border-color: rgba(59, 130, 246, 0.5); }
+        50% { border-color: rgba(59, 130, 246, 0.2); }
+        100% { border-color: rgba(59, 130, 246, 0.5); }
+    }
+    .animate-pulse-border {
+        animation: pulseBorder 2s infinite ease-in-out;
+    }
+
+    @keyframes scanLine {
+        0% { stroke-dashoffset: 360; opacity: 0.2; }
+        50% { stroke-dashoffset: 0; opacity: 0.5; }
+        100% { stroke-dashoffset: -360; opacity: 0.2; }
+    }
+    .animate-face-scan {
+        stroke-dasharray: 360;
+        animation: scanLine 3s infinite linear;
+    }
+</style>
+
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureButton = document.getElementById('capture');
+    const faceImageData = document.getElementById('face_image_data');
+    const preview = document.getElementById('preview');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Access webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+        })
+        .catch(err => {
+            console.error("Error accessing webcam: ", err);
+            preview.innerHTML = '<p class="text-red-500 text-center">Webcam access failed. Please ensure it’s connected and permissions are granted.</p>';
+        });
+
+    // Capture image
+    captureButton.addEventListener('click', () => {
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg');
+        faceImageData.value = dataUrl;
+        preview.innerHTML = `<img src="${dataUrl}" alt="Captured Image" class="w-full h-full object-cover rounded-lg border shadow-sm animate-fade-in-up">`;
+        submitBtn.disabled = false;
+        captureButton.classList.add('opacity-50', 'cursor-not-allowed');
+        captureButton.disabled = true;
+    });
+</script>
+{% endblock %}

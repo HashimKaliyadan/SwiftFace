@@ -1,0 +1,173 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block container %}
+{% include 'includes/canteen_header.html' %}
+
+<div class="flex min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <!-- Sidebar Navigation -->
+    {% include 'includes/canteen_nav.html' %}
+
+    <!-- Main Content -->
+    <main class="flex-grow p-8">
+        <!-- Breadcrumbs -->
+        <nav class="mb-6 animate-fade-in">
+            <ol class="flex items-center space-x-2 text-sm font-medium text-gray-600 bg-white shadow-sm rounded-lg p-3 inline-block">
+                <li>
+                    <a href="{% url 'canteens:index' %}" class="flex items-center hover:text-blue-600 transition-colors duration-300">
+                        <i class="fas fa-tachometer-alt mr-2 text-gray-500"></i> Dashboard
+                    </a>
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-chevron-right mx-2 text-gray-400"></i>
+                    <a href="{% url 'canteens:menu_list' %}" class="hover:text-blue-600 transition-colors duration-300">Menu</a>
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-chevron-right mx-2 text-gray-400"></i>
+                    <span class="text-blue-600 font-semibold">
+                        {% if form.instance.id %}Edit{% else %}Add{% endif %} Menu Item
+                    </span>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Form Container -->
+        <div class="bg-white bg-opacity-95 backdrop-blur-md shadow-2xl rounded-xl p-8 space-y-8 max-w-lg mx-auto mt-12 animate-slide-up border border-gray-100">
+            <h4 class="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-green-500 animate-gradient">
+                {% if form.instance.id %}Edit Menu Item{% else %}Add New Menu Item{% endif %}
+            </h4>
+            <p class="text-sm text-gray-600 text-center">{% if form.instance.id %}Update menu item details{% else %}Create a new menu item{% endif %}</p>
+
+            <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Menu Name -->
+                <div class="relative group">
+                    <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-blue-600">Menu Name</label>
+                    <div class="relative">
+                        <input type="text" name="{{ form.name.name }}" id="{{ form.name.id_for_label }}"
+                               value="{{ form.name.value|default_if_none:'' }}"
+                               class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-blue-500 transition-all duration-300 shadow-sm"
+                               placeholder="e.g., Cheeseburger" required>
+                        <i class="fas fa-utensils absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors duration-300"></i>
+                    </div>
+                    {% if form.name.errors %}
+                        <p class="text-red-500 text-sm mt-1 animate-fade-in">{{ form.name.errors.as_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Menu Image -->
+                <div class="relative group">
+                    <label for="{{ form.image.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-blue-600">Menu Image</label>
+                    <div class="relative">
+                        <input type="file" name="{{ form.image.name }}" id="{{ form.image.id_for_label }}"
+                               class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-blue-500 transition-all duration-300 shadow-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
+                        <i class="fas fa-camera absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors duration-300"></i>
+                    </div>
+                    {% if form.instance.image %}
+                        <div class="mt-2 flex items-center gap-2">
+                            <p class="text-sm text-gray-500">Current Image:</p>
+                            <img src="{{ form.instance.image.url }}" alt="Current Image" class="w-16 h-16 rounded-md border border-gray-200 shadow-sm">
+                        </div>
+                    {% endif %}
+                    {% if form.image.errors %}
+                        <p class="text-red-500 text-sm mt-1 animate-fade-in">{{ form.image.errors.as_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Category -->
+                <div class="relative group">
+                    <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-blue-600">Category</label>
+                    <div class="relative">
+                        <select name="{{ form.category.name }}" id="{{ form.category.id_for_label }}"
+                                class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-blue-500 transition-all duration-300 shadow-sm">
+                            {% for category in form.category.field.queryset %}
+                                <option value="{{ category.id }}" {% if category.id|stringformat:"s" == form.category.value|stringformat:"s" %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <i class="fas fa-list absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors duration-300"></i>
+                    </div>
+                    {% if form.category.errors %}
+                        <p class="text-red-500 text-sm mt-1 animate-fade-in">{{ form.category.errors.as_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Price -->
+                <div class="relative group">
+                    <label for="{{ form.price.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-blue-600">Price</label>
+                    <div class="relative">
+                        <input type="number" name="{{ form.price.name }}" id="{{ form.price.id_for_label }}" step="0.01"
+                               value="{{ form.price.value|default_if_none:'' }}"
+                               class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-blue-500 transition-all duration-300 shadow-sm"
+                               placeholder="e.g., 5.99" required>
+                        <i class="fas fa-dollar-sign absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors duration-300"></i>
+                    </div>
+                    {% if form.price.errors %}
+                        <p class="text-red-500 text-sm mt-1 animate-fade-in">{{ form.price.errors.as_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Availability -->
+                <div class="relative group">
+                    <label for="{{ form.is_available.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-blue-600">Available</label>
+                    <div class="relative">
+                        <select name="{{ form.is_available.name }}" id="{{ form.is_available.id_for_label }}"
+                                class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-blue-500 transition-all duration-300 shadow-sm">
+                            <option value="True" {% if form.is_available.value == True %}selected{% endif %}>Yes</option>
+                            <option value="False" {% if form.is_available.value == False %}selected{% endif %}>No</option>
+                        </select>
+                        <i class="fas fa-check-circle absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors duration-300"></i>
+                    </div>
+                    {% if form.is_available.errors %}
+                        <p class="text-red-500 text-sm mt-1 animate-fade-in">{{ form.is_available.errors.as_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Buttons -->
+                <div class="space-y-4">
+                    <button type="submit"
+                            class="w-full px-8 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:from-blue-600 hover:to-green-600 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-save mr-2"></i> Save Menu Item
+                    </button>
+                    <a href="{% url 'canteens:menu_list' %}" class="block w-full px-8 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 hover:text-gray-900 transition-all duration-300 border border-gray-300 shadow-sm text-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Menu
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+<style>
+    /* Fade In Animation */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .animate-fade-in {
+        animation: fadeIn 1s ease-out forwards;
+    }
+
+    /* Slide Up Animation */
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-slide-up {
+        animation: slideUp 0.8s ease-out forwards;
+    }
+
+    /* Gradient Animation */
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .animate-gradient {
+        background-size: 200% 200%;
+        animation: gradient 5s ease infinite;
+    }
+</style>
+{% endblock %}

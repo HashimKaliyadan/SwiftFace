@@ -1,0 +1,84 @@
+<!-- confirm_recharge.html -->
+{% extends "base/student_base.html" %}
+{% load static %}
+
+{% block content %}
+<div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(to bottom right, #d1fae5, #dbeafe); padding: 2rem;">
+    <div style="max-width: 28rem; width: 100%; background: white; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); border-radius: 1rem; overflow: hidden; transition: all 0.3s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 15px 30px rgba(0, 0, 0, 0.15)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 10px 20px rgba(0, 0, 0, 0.1)';">
+        <!-- Header Section -->
+        <div style="background: linear-gradient(to right, #10b981, #14b8a6); padding: 1.5rem; animation: pulse-slow 4s ease-in-out infinite;">
+            <h1 style="font-size: 1.75rem; font-weight: 700; color: white; text-align: center; display: flex; align-items: center; justify-content: center; gap: 0.5rem; animation: fade-in-down 0.5s ease-out;">
+                <span>Confirm Recharge for {{ student.name }}</span>
+            </h1>
+        </div>
+
+        <!-- Content Section -->
+        <div style="padding: 1.5rem;">
+            <p style="font-size: 1.125rem; color: #1f2937; margin-bottom: 1.5rem; text-align: center; animation: fade-in-up 0.5s ease-out;">
+                You’re about to add <span style="color: #059669; font-weight: 600; font-size: 1.25rem; animation: pulse 2s infinite;">${{ amount }}</span> to your wallet!
+            </p>
+
+            <!-- Confirmation Form -->
+            <form method="POST" action="{% url 'parents:confirm_recharge' student.student_id %}" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                {% csrf_token %}
+                <input type="hidden" name="amount" value="{{ amount }}">
+
+                <!-- Confirm Button -->
+                <button type="submit"
+                        style="width: 100%; padding: 0.75rem 1.5rem; background: linear-gradient(to right, #10b981, #14b8a6); color: white; font-weight: 600; border-radius: 0.5rem; transition: all 0.3s ease; transform: scale(1); display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); animation: bounce-in 0.5s ease-out;"
+                        onmouseover="this.style.background='linear-gradient(to right, #059669, #0d9488)'; this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 12px rgba(0, 0, 0, 0.15)';"
+                        onmouseout="this.style.background='linear-gradient(to right, #10b981, #14b8a6)'; this.style.transform='scale(1)'; this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.1)';"
+                        onmousedown="this.style.transform='scale(0.95)';"
+                        onmouseup="this.style.transform='scale(1)';">
+                    <i class="fa-solid fa-check"></i>
+                    <span>Confirm Recharge</span>
+                </button>
+            </form>
+
+            <!-- Back to Recharge Link -->
+            <div style="margin-top: 1.5rem; text-align: center; animation: fade-in-up 0.5s ease-out;">
+                <a href="{% url 'parents:recharge_wallet' student.student_id %}"
+                   style="font-size: 0.875rem; color: #0d9488; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.25rem; transition: all 0.3s ease;"
+                   onmouseover="this.style.color='#0f766e'; this.style.textDecoration='none'; this.style.transform='scale(1.05)';"
+                   onmouseout="this.style.color='#0d9488'; this.style.textDecoration='none'; this.style.transform='scale(1)';">
+                    <i class="fa-solid fa-arrow-left" style="animation: pulse 2s infinite;"></i>
+                    <span>Back to Recharge</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Inline Animation Keyframes -->
+<style>
+    @keyframes fade-in-down {
+        0% { opacity: 0; transform: translateY(-10px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fade-in-up {
+        0% { opacity: 0; transform: translateY(10px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+    @keyframes bounce-in {
+        0% { transform: scale(0.9); opacity: 0; }
+        60% { transform: scale(1.05); opacity: 1; }
+        100% { transform: scale(1); }
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.8; }
+    }
+    @keyframes spin-slow {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    @keyframes pulse-slow {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.9; }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% load static %}
+
+<header class="bg-white shadow-sm">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <!-- Logo or Dashboard Title -->
+        <h1 class="text-2xl font-semibold text-gray-800">Canteen Dashboard</h1>
+
+        <!-- Navigation Links -->
+        <div class="flex items-center space-x-6">
+            <a href="{% url 'canteens:index' %}" class="text-gray-600 hover:text-blue-600 transition duration-300 font-medium">
+                Home
+            </a>
+            <form method="POST" action="{% url 'canteens:logout' %}" class="inline">
+                {% csrf_token %}
+                <button type="submit" class="text-gray-600 hover:text-blue-600 transition duration-300 font-medium bg-transparent border-none cursor-pointer">
+                    Logout
+                </button>
+            </form>                      
+        </div>
+    </div>
+</header>

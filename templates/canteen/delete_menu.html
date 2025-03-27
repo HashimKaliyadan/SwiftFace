@@ -1,0 +1,10 @@
+{% extends "base/base.html" %}
+{% block content %}
+    <h1>Delete Menu Item</h1>
+    <p>Are you sure you want to delete {{ menu.name }}?</p>
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit">Yes, Delete</button>
+    </form>
+    <a href="{% url 'canteens:menu_list' %}" class="btn">Cancel</a>
+{% endblock %}

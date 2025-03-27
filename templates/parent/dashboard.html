@@ -1,0 +1,211 @@
+{% extends "base/student_base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-8 relative overflow-hidden">
+    <!-- Subtle Parallax Background -->
+    <div class="absolute inset-0 z-0 parallax-bg"></div>
+
+    <div class="max-w-6xl mx-auto relative z-10">
+        <!-- Header with Logout -->
+        <div class="flex justify-between items-center mb-12">
+            <h1 class="text-5xl font-extrabold text-gray-900 text-center tracking-tight animate-fade-in-down">Parent Dashboard</h1>
+            <form method="POST" action="{% url 'parents:parentlogout' %}" class="inline">
+                {% csrf_token %}
+                <button type="submit" 
+                        class="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-lg shadow-lg hover:from-red-700 hover:to-red-800 transform hover:scale-105 transition-all duration-300 flex items-center space-x-2 animate-fade-in-up">
+                    <i class="fa-solid fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Messages Pop-up (Same as Cart) -->
+        {% if messages %}
+        <div id="message-popup" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div class="bg-white rounded-lg p-6 shadow-lg max-w-sm w-full transform transition-all duration-300 scale-100">
+                {% for message in messages %}
+                <div class="flex items-center space-x-2">
+                    {% if message.tags == 'success' %}
+                    <i class="fa-solid fa-check-circle text-green-500 text-2xl"></i>
+                    {% elif message.tags == 'error' %}
+                    <i class="fa-solid fa-exclamation-circle text-red-500 text-2xl"></i>
+                    {% endif %}
+                    <p class="text-lg text-gray-800">{{ message }}</p>
+                </div>
+                {% endfor %}
+                <button id="close-popup" class="mt-4 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 w-full">Close</button>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Students Under Parents -->
+        <div class="bg-white shadow-2xl rounded-2xl p-8 mb-12 transform transition-all duration-500 hover:shadow-3xl">
+            <h2 class="text-3xl font-semibold text-gray-800 mb-6 flex items-center space-x-2 animate-fade-in-up">
+                <i class="fa-solid fa-users text-blue-600"></i>
+                <span>Students Under Your Care</span>
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full border-collapse">
+                    <thead class="bg-gradient-to-r from-blue-100 to-blue-200 text-gray-800">
+                        <tr>
+                            <th class="px-6 py-4 text-left font-semibold rounded-tl-xl">Student ID</th>
+                            <th class="px-6 py-4 text-left font-semibold">Name</th>
+                            <th class="px-6 py-4 text-left font-semibold">Balance</th>
+                            <th class="px-6 py-4 text-left font-semibold rounded-tr-xl">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 bg-white">
+                        {% for student in students %}
+                            <tr class="hover:bg-blue-50 transition-all duration-300 animate-fade-in-up">
+                                <td class="px-6 py-4 text-gray-900 font-medium">{{ student.student_id }}</td>
+                                <td class="px-6 py-4 text-gray-900 font-medium">{{ student.name }}</td>
+                                <td class="px-6 py-4 text-green-700 font-semibold">${{ student.balance }}</td>
+                                <td class="px-6 py-4">
+                                    <a href="{% url 'parents:recharge_wallet' student.student_id %}" 
+                                       class="text-blue-600 hover:text-blue-800 font-semibold flex items-center space-x-1 transition-all duration-300 hover:scale-105">
+                                        <i class="fa-solid fa-wallet"></i>
+                                        <span>Recharge</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-gray-500 py-6 animate-fade-in-up">No students linked to your account.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Orders -->
+        <div class="bg-white shadow-2xl rounded-2xl p-8 mb-12 transform transition-all duration-500 hover:shadow-3xl">
+            <h2 class="text-3xl font-semibold text-gray-800 mb-6 flex items-center space-x-2 animate-fade-in-up">
+                <i class="fa-solid fa-shopping-cart text-blue-600"></i>
+                <span>Orders</span>
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full border-collapse">
+                    <thead class="bg-gradient-to-r from-blue-100 to-blue-200 text-gray-800">
+                        <tr>
+                            <th class="px-6 py-4 text-left font-semibold rounded-tl-xl">Student</th>
+                            <th class="px-6 py-4 text-left font-semibold">Item</th>
+                            <th class="px-6 py-4 text-left font-semibold">Amount</th>
+                            <th class="px-6 py-4 text-left font-semibold rounded-tr-xl">Date/Time</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 bg-white">
+                        {% for order in orders %}
+                            <tr class="hover:bg-blue-50 transition-all duration-300 animate-fade-in-up">
+                                <td class="px-6 py-4 text-gray-900 font-medium">{{ order.student.name }}</td>
+                                <td class="px-6 py-4 text-gray-700">{{ order.menu_item.name }}</td>
+                                <td class="px-6 py-4 text-green-700 font-semibold">${{ order.amount }}</td>
+                                <td class="px-6 py-4 text-gray-700">{{ order.timestamp|date:"F d, Y H:i" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-gray-500 py-6 animate-fade-in-up">No orders found.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pre Order -->
+        <div class="bg-white shadow-2xl rounded-2xl p-8 transform transition-all duration-500 hover:shadow-3xl">
+            <h2 class="text-3xl font-semibold text-gray-800 mb-6 flex items-center space-x-2 animate-fade-in-up">
+                <i class="fa-solid fa-clipboard-list text-blue-600"></i>
+                <span>Pre Order</span>
+            </h2>
+            <form method="POST" class="space-y-6">
+                {% csrf_token %}
+                <div class="animate-fade-in-up">
+                    <label for="student_select" class="block text-sm font-medium text-gray-700 mb-2">Select Student</label>
+                    <select id="student_select" name="student_id" 
+                            class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-4 focus:ring-blue-500 focus:outline-none transition-all duration-300 hover:border-blue-400">
+                        {% for student in students %}
+                            <option value="{{ student.student_id }}">{{ student.name }} (Balance: ${{ student.balance }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="animate-fade-in-up">
+                    <label for="menu_item_select" class="block text-sm font-medium text-gray-700 mb-2">Select Menu Item</label>
+                    <select id="menu_item_select" name="menu_item_id" 
+                            class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:ring-4 focus:ring-blue-500 focus:outline-none transition-all duration-300 hover:border-blue-400">
+                        {% for item in menu_items %}
+                            <option value="{{ item.id }}">{{ item.name }} (${{ item.price }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" 
+                        class="w-full px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-lg shadow-lg hover:from-green-700 hover:to-green-800 transform hover:scale-105 transition-all duration-300 animate-bounce-in">
+                    Place Pre-Order
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+    .parallax-bg {
+        background-attachment: fixed;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        opacity: 0.15;
+        transform: translateZ(-1px) scale(1.1);
+    }
+
+    /* Fade-in animations */
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-down {
+        animation: fadeInDown 0.6s ease-out forwards;
+    }
+    .animate-fade-in-up {
+        animation: fadeInUp 0.6s ease-out forwards;
+        animation-delay: 0.2s;
+    }
+
+    /* Bounce-in effect for button */
+    @keyframes bounceIn {
+        0% { transform: scale(0); opacity: 0; }
+        60% { transform: scale(1.05); opacity: 1; }
+        100% { transform: scale(1); }
+    }
+    .animate-bounce-in {
+        animation: bounceIn 0.8s ease-out forwards;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Parallax effect
+    window.addEventListener('scroll', () => {
+        const parallax = document.querySelector('.parallax-bg');
+        let scrollPosition = window.pageYOffset;
+        parallax.style.transform = `translateY(${scrollPosition * 0.3}px)`;
+    });
+
+    // Close pop-up when button is clicked
+    document.getElementById('close-popup').addEventListener('click', function() {
+        document.getElementById('message-popup').classList.add('hidden');
+    });
+
+    // Optional: Auto-close after 3 seconds
+    setTimeout(() => {
+        document.getElementById('message-popup').classList.add('hidden');
+    }, 3000);
+</script>
+{% endblock %}
+{% endblock %}
