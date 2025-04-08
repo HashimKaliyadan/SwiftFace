@@ -1,0 +1,178 @@
+{% extends "base/base.html" %}
+{% block container %}
+{% load static %}
+
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="w-full h-full bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.05),transparent_70%)]"></div>
+    </div>
+
+    <div class="max-w-md w-full bg-white shadow-2xl rounded-xl p-8 border border-gray-200 relative z-10 transform hover:scale-105 transition-all duration-500">
+        <div class="text-center mb-8">
+            <h2 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-blue-600 animate-gradient">
+                Register Canteen Staff
+            </h2>
+            <p class="mt-2 text-sm text-gray-600">Create your staff account and canteen</p>
+        </div>
+
+        <form class="mt-8 space-y-6" action="{% url 'canteens:register' %}" method="POST">
+            {% csrf_token %}
+
+            <div class="space-y-6">
+                <!-- Staff ID Field -->
+                <div class="relative group">
+                    <label for="staff_id" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-green-600">Staff ID</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-id-card text-gray-400 group-focus-within:text-green-600 transition-colors duration-300"></i>
+                        </div>
+                        <input id="staff_id" name="staff_id" type="text" required
+                               class="appearance-none block w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-green-500 transition-all duration-300 shadow-sm"
+                               placeholder="Enter your staff ID">
+                    </div>
+                </div>
+
+                <!-- Email Field -->
+                <div class="relative group">
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-green-600">Email Address</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400 group-focus-within:text-green-600 transition-colors duration-300"></i>
+                        </div>
+                        <input id="email" name="email" type="email" required
+                               class="appearance-none block w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-green-500 transition-all duration-300 shadow-sm"
+                               placeholder="Enter your email">
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="relative group">
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-green-600">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400 group-focus-within:text-green-600 transition-colors duration-300"></i>
+                        </div>
+                        <input id="password" name="password" type="password" required
+                               class="appearance-none block w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-green-500 transition-all duration-300 shadow-sm"
+                               placeholder="Enter your password">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <i class="fas fa-eye-slash text-gray-400 hover:text-gray-600 cursor-pointer transition-colors duration-300" id="togglePassword"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Confirm Password Field -->
+                <div class="relative group">
+                    <label for="confirm_password" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-green-600">Confirm Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400 group-focus-within:text-green-600 transition-colors duration-300"></i>
+                        </div>
+                        <input id="confirm_password" name="confirm_password" type="password" required
+                               class="appearance-none block w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-green-500 transition-all duration-300 shadow-sm"
+                               placeholder="Confirm your password">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <i class="fas fa-eye-slash text-gray-400 hover:text-gray-600 cursor-pointer transition-colors duration-300" id="toggleConfirmPassword"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Canteen Name Field -->
+                <div class="relative group">
+                    <label for="canteen_name" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-green-600">Canteen Name</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-store text-gray-400 group-focus-within:text-green-600 transition-colors duration-300"></i>
+                        </div>
+                        <input id="canteen_name" name="canteen_name" type="text" required
+                               class="appearance-none block w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-green-500 transition-all duration-300 shadow-sm"
+                               placeholder="Enter canteen name">
+                    </div>
+                </div>
+
+                <!-- Location Field -->
+                <div class="relative group">
+                    <label for="location" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-green-600">Location (Optional)</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-map-marker-alt text-gray-400 group-focus-within:text-green-600 transition-colors duration-300"></i>
+                        </div>
+                        <input id="location" name="location" type="text"
+                               class="appearance-none block w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent hover:border-green-500 transition-all duration-300 shadow-sm"
+                               placeholder="Enter canteen location">
+                    </div>
+                </div>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="text-sm font-semibold text-red-500 text-center animate-fade-in">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Submit Button -->
+            <div>
+                <button type="submit"
+                        class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-green-500 hover:from-green-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-300 transform hover:scale-105 shadow-md">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <i class="fas fa-user-plus text-white/80 group-hover:text-white transition-colors duration-300"></i>
+                    </span>
+                    Register
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-6 text-center space-y-4">
+            <a href="{% url 'canteens:login' %}" class="inline-block w-full py-3 px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 hover:text-gray-900 transition-all duration-300 border border-gray-300 shadow-sm">Back to Login</a>
+            <p class="text-sm text-gray-600">
+                Already have an account?
+                <a href="{% url 'canteens:login' %}" class="font-medium text-green-600 hover:text-green-500 transition-colors duration-200">Sign in</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .animate-fade-in {
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .animate-gradient {
+        background-size: 200% 200%;
+        animation: gradient 5s ease infinite;
+    }
+</style>
+
+<script>
+    const togglePassword = document.querySelector('#togglePassword');
+    const password = document.querySelector('#password');
+    const toggleConfirmPassword = document.querySelector('#toggleConfirmPassword');
+    const confirmPassword = document.querySelector('#confirm_password');
+
+    togglePassword.addEventListener('click', function () {
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+
+    toggleConfirmPassword.addEventListener('click', function () {
+        const type = confirmPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+        confirmPassword.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+</script>
+
+{% endblock %}

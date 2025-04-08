@@ -5,6 +5,7 @@ app_name = 'parents'
 
 urlpatterns = [
     path('login/', views.login, name='parentlogin'),
+    path('register/', views.register, name='register'),
     path('logout/', views.logout, name='parentlogout'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('recharge/<str:student_id>/', views.recharge_wallet, name='recharge_wallet'),

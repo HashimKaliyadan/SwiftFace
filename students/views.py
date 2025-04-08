@@ -12,7 +12,7 @@ from PIL import Image
 import numpy as np
 from keras_facenet import FaceNet
 
-# Load FaceNet model (no need for face_model.keras)
+
 face_model = FaceNet()
 
 def extract_face_embedding(image_data, model):

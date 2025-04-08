@@ -11,6 +11,7 @@ GENDER_CHOICES = (
 class User(AbstractUser):
     username = None  # Remove the default username field
     email = models.EmailField(max_length=100, unique=True, null=True, blank=True)
+    name = models.CharField(max_length=100, null=True, blank=True)  # Added name field
     phone_number = models.CharField(
         max_length=15, null=True, blank=True, unique=True,
         error_messages={'unique': 'Mobile Number already exists'}
@@ -29,7 +30,7 @@ class User(AbstractUser):
     objects = UserManager()
 
     def __str__(self):
-        return self.email if self.email else f"User {self.id}"
+        return self.name if self.name else (self.email if self.email else f"User {self.id}")
 
     class Meta:
         verbose_name = 'User'

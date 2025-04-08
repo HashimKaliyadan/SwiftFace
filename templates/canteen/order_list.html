@@ -46,7 +46,7 @@
                                 <tr class="border-b border-gray-200 hover:bg-gray-50 transition-all duration-300 animate-fade-in-up" >
                                     <td class="px-6 py-4 text-gray-900 font-medium">{{ transaction.student.name }}</td>
                                     <td class="px-6 py-4 text-gray-700">{{ transaction.menu_item.name|default:"N/A" }}</td>
-                                    <td class="px-6 py-4 text-green-600 font-semibold">${{ transaction.amount }}</td>
+                                    <td class="px-6 py-4 text-green-600 font-semibold">₹{{ transaction.amount }}</td>
                                     <td class="px-6 py-4 text-gray-700">{{ transaction.timestamp|date:"F d, Y H:i" }}</td>
                                     <td class="px-6 py-4 text-gray-700">{{ transaction.processed_by.email|default:"N/A" }}</td>
                                 </tr>

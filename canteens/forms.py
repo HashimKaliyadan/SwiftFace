@@ -1,11 +1,16 @@
 from django import forms
 from canteens.models import Student, Category, Menu, Transaction
 from users.models import User
+import random
+import string
 
 class StudentForm(forms.ModelForm):
+    email = forms.EmailField(required=False, widget=forms.EmailInput(attrs={'placeholder': 'Enter email'}))
+    password = forms.CharField(required=False, widget=forms.PasswordInput(attrs={'placeholder': 'Enter password'}))
+
     class Meta:
         model = Student
-        fields = ['student_id', 'name', 'parent', 'parent_phone', 'face_image', 'user', 'balance']  # Replaced 'parent_name' with 'parent'
+        fields = ['student_id', 'name', 'parent', 'parent_phone', 'face_image', 'user', 'balance', 'email', 'password']
         widgets = {
             'student_id': forms.TextInput(attrs={'placeholder': 'Enter Student ID'}),
             'name': forms.TextInput(attrs={'placeholder': 'Enter Student Name'}),
@@ -24,6 +29,22 @@ class StudentForm(forms.ModelForm):
         # Limit parent choices to parents only
         self.fields['parent'].queryset = User.objects.filter(is_parent=True)
         self.fields['parent'].required = False  # Make parent optional
+
+    def clean(self):
+        cleaned_data = super().clean()
+        user = cleaned_data.get('user')
+        email = cleaned_data.get('email')
+        password = cleaned_data.get('password')
+
+        if not user:
+            if not email or not password:
+                # Generate random email and password if none provided
+                email = f"student_{''.join(random.choices(string.ascii_lowercase + string.digits, k=8))}@example.com"
+                password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+                cleaned_data['email'] = email
+                cleaned_data['password'] = password
+            # If email and password are provided, they will be used as is
+        return cleaned_data
 
     def clean_student_id(self):
         student_id = self.cleaned_data['student_id']

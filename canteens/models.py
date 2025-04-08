@@ -4,10 +4,22 @@ from users.models import User
 class Student(models.Model):
     student_id = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=100)
-    parent = models.ForeignKey(User, on_delete=models.CASCADE, related_name='children', limit_choices_to={'is_parent': True}, null=True, blank=True)
+    parent = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='children',
+        limit_choices_to={'is_parent': True},
+        null=True,
+        blank=True
+    )
     parent_phone = models.CharField(max_length=15)
     face_image = models.ImageField(upload_to='students/', null=True, blank=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="student_profile", limit_choices_to={'is_student': True})
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="student_profile",
+        limit_choices_to={'is_student': True}
+    )
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     class Meta:
@@ -54,3 +66,11 @@ class Transaction(models.Model):
 
     def __str__(self):
         return f"{self.student.name} - {self.amount} ({self.timestamp})"
+    
+class Canteen(models.Model):
+    name = models.CharField(max_length=100)
+    location = models.CharField(max_length=200, blank=True)
+    manager = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, limit_choices_to={'is_canteen': True})
+
+    def __str__(self):
+        return self.name    

@@ -71,16 +71,28 @@
                         {% endif %}
                     </div>
 
-                    <!-- User Dropdown -->
+                                        <!-- User Dropdown -->
+                                    <!-- Inside the form grid -->
                     <div class="relative group">
-                        <label for="{{ form.user.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-blue-600">Assign User</label>
+                        <label for="{{ form.user.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-blue-600">Assign User (Optional)</label>
                         {{ form.user }}
                         {% if form.user.errors %}
                             <p class="text-red-500 text-sm mt-1 animate-fade-in">{{ form.user.errors.as_text }}</p>
                         {% endif %}
                     </div>
 
-                    <!-- Balance -->
+                    <!-- New Email and Password Fields (Initially Hidden) -->
+                    <div class="relative group email-field" style="display: none;">
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-blue-600">Email</label>
+                        <input type="email" name="email" id="email" class="w-full p-3 border rounded-lg" placeholder="Enter email" required>
+                    </div>
+
+                    <div class="relative group password-field" style="display: none;">
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-blue-600">Password</label>
+                        <input type="password" name="password" id="password" class="w-full p-3 border rounded-lg" placeholder="Enter password" required>
+                    </div>
+
+                    <!-- Balance Field remains unchanged -->
                     <div class="relative group">
                         <label for="{{ form.balance.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1 transition-all duration-300 group-focus-within:text-blue-600">Initial Balance</label>
                         {{ form.balance }}
@@ -195,5 +207,27 @@
         // Show preview with animation
         preview.innerHTML = `<img src="${dataUrl}" alt="Captured Image" class="rounded-lg border border-gray-300 shadow-sm animate-fade-in" style="max-width: 320px;">`;
     });
+
+        // Toggle email and password fields based on user selection
+    const userSelect = document.getElementById('id_user');
+    const emailField = document.querySelector('.email-field');
+    const passwordField = document.querySelector('.password-field');
+
+    userSelect.addEventListener('change', () => {
+        if (userSelect.value === '' || userSelect.value === null) {
+            emailField.style.display = 'block';
+            passwordField.style.display = 'block';
+            document.getElementById('email').setAttribute('required', 'required');
+            document.getElementById('password').setAttribute('required', 'required');
+        } else {
+            emailField.style.display = 'none';
+            passwordField.style.display = 'none';
+            document.getElementById('email').removeAttribute('required');
+            document.getElementById('password').removeAttribute('required');
+        }
+    });
+
+    // Trigger change event on page load to set initial state
+    userSelect.dispatchEvent(new Event('change'));
 </script>
 {% endblock %}

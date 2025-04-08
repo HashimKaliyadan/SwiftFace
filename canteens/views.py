@@ -12,22 +12,22 @@ import base64
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from PIL import Image
+from users.models import User
 
 # Dashboard with transaction overview
-@login_required(login_url="/canteens/login/")
+@login_required(login_url="/login/")
 @allow_canteen
 def index(request):
-    try:
-        recent_transactions = Transaction.objects.all().select_related('student', 'menu_item')[:10]
-        total_sales = Transaction.objects.aggregate(total=Sum('amount'))['total'] or 0
-    except Exception as e:
-        messages.error(request, "Error loading dashboard data.")
-        recent_transactions = []
-        total_sales = 0
+    total_students = Student.objects.count()
+    total_categories = Category.objects.count()
+    total_menu_items = Menu.objects.count()
+    total_transactions = Transaction.objects.aggregate(total=Sum('amount'))['total'] or 0
     context = {
-        "title": "Canteen | Dashboard",
-        "transactions": recent_transactions,
-        "total_sales": total_sales,
+        "title": "Canteen Dashboard",
+        "total_students": total_students,
+        "total_categories": total_categories,
+        "total_menu_items": total_menu_items,
+        "total_transactions": total_transactions,
     }
     return render(request, "canteen/index.html", context)
 
@@ -47,6 +47,8 @@ def login(request):
             if user and user.is_canteen:
                 auth_login(request, user)
                 return redirect('canteens:index')
+            else:
+                messages.error(request, "Invalid email or password.")
 
     return render(request, "canteen/login.html", context)
 
@@ -103,36 +105,51 @@ def student_list(request):
     context = {"title": "Canteen | Students", "students": students}
     return render(request, "canteen/students.html", context)
 
+# Add Student View
 @login_required(login_url="/login/")
 @allow_canteen
 def add_student(request):
     if request.method == "POST":
-        # Create a mutable copy of POST data to modify it
         post_data = request.POST.copy()
         
         # Handle the base64 image from the webcam
         face_image_data = post_data.get('face_image')
         if face_image_data and face_image_data.startswith('data:image'):
-            # Extract the base64 string (remove "data:image/jpeg;base64," prefix)
             format, imgstr = face_image_data.split(';base64,')
-            ext = format.split('/')[-1]  # Get extension (e.g., 'jpeg')
+            ext = format.split('/')[-1]
             data = base64.b64decode(imgstr)
-            
-            # Convert to a file-like object for Django's ImageField
             file_io = BytesIO(data)
             image = Image.open(file_io)
-            file_io.seek(0)  # Reset buffer position
+            file_io.seek(0)
             image_file = InMemoryUploadedFile(
                 file_io, None, f"face_image.{ext}", f"image/{ext}",
                 len(data), None
             )
-            # Add the file to request.FILES
             request.FILES['face_image'] = image_file
         
         form = StudentForm(post_data, request.FILES or None)
         if form.is_valid():
-            student = form.save()
-            messages.success(request, f"Student {student.name} added successfully.")
+            user = form.cleaned_data['user']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+
+            # Create the student instance without saving to DB yet
+            student = form.save(commit=False)
+
+            if not user:
+                # Create a new User if none is selected
+                new_user = User.objects.create_user(
+                    email=email,
+                    password=password,
+                    is_student=True
+                )
+                student.user = new_user  # Assign the new user directly to the student instance
+            else:
+                student.user = user  # Use the selected user
+
+            # Save the student instance with the user set
+            student.save()
+            messages.success(request, f"Student {student.name} added successfully. Email: {email}")
             return redirect('canteens:canteen_students')
         else:
             messages.error(request, "Error adding student. Please check the form.")
@@ -142,18 +159,25 @@ def add_student(request):
     context = {"title": "Canteen | Add Student", "form": form}
     return render(request, "canteen/add_student.html", context)
 
+# Edit Student View
 @login_required(login_url="/login/")
 @allow_canteen
 def edit_student(request, student_id):
     student = get_object_or_404(Student, student_id=student_id)
-    form = StudentForm(request.POST or None, request.FILES or None, instance=student)
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, f"Student {student.name} updated successfully.")
-        return redirect('canteens:canteen_students')
-    context = {"title": "Canteen | Edit Student", "form": form}
+    if request.method == "POST":
+        form = StudentForm(request.POST, request.FILES or None, instance=student)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Student {student.name} updated successfully.")
+            return redirect('canteens:canteen_students')
+        else:
+            messages.error(request, "Error updating student. Please check the form.")
+    else:
+        form = StudentForm(instance=student)
+    context = {"title": "Canteen | Edit Student", "form": form, "student": student}
     return render(request, "canteen/edit_student.html", context)
 
+# Delete Student View
 @login_required(login_url="/login/")
 @allow_canteen
 def delete_student(request, student_id):
@@ -230,7 +254,7 @@ def edit_menu(request, menu_id):
     menu = get_object_or_404(Menu, id=menu_id)
     form = MenuForm(request.POST or None, request.FILES or None, instance=menu)
     if request.method == "POST" and form.is_valid():
-        form.save()
+        form.saveIt()
         return redirect('canteens:menu_list')
     context = {"title": "Canteen | Edit Menu Item", "form": form}
     return render(request, "canteen/menu_form.html", context)
@@ -244,3 +268,34 @@ def delete_menu(request, menu_id):
         return redirect('canteens:menu_list')
     context = {"title": "Canteen | Delete Menu Item", "menu": menu}
     return render(request, "canteen/delete_menu.html", context)
+
+def register(request):
+    if request.user.is_authenticated and request.user.is_canteen:
+        return redirect('canteens:index')
+
+    if request.method == "POST":
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+            return render(request, "canteen/register.html", {"title": "Canteen | Register"})
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email is already registered.")
+            return render(request, "canteen/register.html", {"title": "Canteen | Register"})
+
+        # Create new canteen staff user
+        try:
+            user = User.objects.create_user(
+                email=email,
+                password=password,
+                is_canteen=True  # Mark as canteen staff
+            )
+            messages.success(request, "Registration successful! Please log in.")
+            return redirect('canteens:login')
+        except Exception as e:
+            messages.error(request, f"Registration failed: {str(e)}")
+
+    return render(request, "canteen/register.html", {"title": "Canteen | Register"})

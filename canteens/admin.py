@@ -3,20 +3,18 @@ from canteens.models import Student, Menu, Category
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name',)  # Display category names
-    search_fields = ('name',)  # Enable search by category name
+    list_display = ('name',)
+    search_fields = ('name',)
     ordering = ('name',)
 
 @admin.register(Menu)
 class MenuAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'price', 'is_available')  # Updated 'available' to 'is_available'
-    list_filter = ('category', 'is_available')  # Updated 'available' to 'is_available'
-    search_fields = ('name',)  # Searchable by menu item name
-    ordering = ('category', 'name')  # Default ordering
+    list_display = ('name', 'category', 'price', 'is_available')
+    list_filter = ('category', 'is_available')
+    search_fields = ('name',)
+    ordering = ('category', 'name')
     fieldsets = (
-        ("Menu Details", {
-            'fields': ('name', 'category', 'price', 'is_available', 'image')  # Already correct
-        }),
+        ("Menu Details", {'fields': ('name', 'category', 'price', 'is_available', 'image')}),
     )
 
 @admin.register(Student)
@@ -41,3 +39,7 @@ class StudentAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return True
+
+admin.site.site_header = "Administration"
+admin.site.site_title = "Admin Portal"
+admin.site.index_title = "Welcome"

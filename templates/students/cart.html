@@ -80,8 +80,8 @@
                                             </button>
                                         </form>
                                     </td>
-                                    <td class="px-6 py-4 text-right text-gray-700">${{ item.menu_item.price }}</td>
-                                    <td class="px-6 py-4 text-right text-green-600 font-semibold">${{ item.total_price }}</td>
+                                    <td class="px-6 py-4 text-right text-gray-700">₹{{ item.menu_item.price }}</td>
+                                    <td class="px-6 py-4 text-right text-green-600 font-semibold">₹{{ item.total_price }}</td>
                                     <td class="px-6 py-4 text-right">
                                         <form method="POST">
                                             {% csrf_token %}

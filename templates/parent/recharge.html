@@ -19,7 +19,7 @@
         <!-- Content Section -->
         <div style="padding: 1.5rem;">
             <p style="font-size: 1.125rem; color: #1f2937; margin-bottom: 1.5rem; text-align: center;">
-                Current Balance: <span style="color: #059669; font-weight: 700; font-size: 1.25rem; animation: pulse 2s infinite;">${{ student.balance }}</span>
+                Current Balance: <span style="color: #059669; font-weight: 700; font-size: 1.25rem; animation: pulse 2s infinite;">₹{{ student.balance }}</span>
             </p>
 
             <!-- Recharge Form -->
@@ -30,7 +30,7 @@
                         Enter Your Amount :
                     </label>
                     <div style="position: relative;">
-                        <span style="position: absolute; top: 0; bottom: 0; left: 0; padding-left: 0.75rem; display: flex; align-items: center; color: #10b981; font-weight: 700;">$</span>
+                        <span style="position: absolute; top: 0; bottom: 0; left: 0; padding-left: 0.75rem; display: flex; align-items: center; color: #10b981; font-weight: 700;">₹</span>
                         <input type="number" name="amount" id="amount" step="0.01" min="0" required
                                style="width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; background: #f0fdf4; border: 1px solid #6ee7b7; border-radius: 0.5rem; outline: none; transition: all 0.3s ease; box-shadow: none;"
                                placeholder="e.g., 10.00"

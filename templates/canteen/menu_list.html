@@ -53,7 +53,7 @@
                                 <tr class="border-b border-gray-200 hover:bg-gray-50 transition-all duration-300 animate-fade-in-up">
                                     <td class="px-6 py-4 text-gray-900 font-medium">{{ menu.name }}</td>
                                     <td class="px-6 py-4 text-gray-700">{{ menu.category.name }}</td>
-                                    <td class="px-6 py-4 text-green-600 font-semibold">${{ menu.price }}</td>
+                                    <td class="px-6 py-4 text-green-600 font-semibold">₹{{ menu.price }}</td>
                                     <td class="px-6 py-4">
                                         <span class="inline-flex items-center px-2 py-1 rounded-full text-sm font-semibold {% if menu.is_available %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
                                             <i class="fas {% if menu.is_available %}fa-check{% else %}fa-times{% endif %} mr-1"></i>

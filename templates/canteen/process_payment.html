@@ -76,7 +76,7 @@
                             <option value="" {% if not form.menu_item.value %}selected{% endif %}>-- Select an Item --</option>
                             {% for menu_item in form.menu_item.field.queryset %}
                                 <option value="{{ menu_item.id }}" {% if menu_item.id|stringformat:"s" == form.menu_item.value|stringformat:"s" %}selected{% endif %}>
-                                    {{ menu_item.name }} (${{ menu_item.price }})
+                                    {{ menu_item.name }} (₹{{ menu_item.price }})
                                 </option>
                             {% endfor %}
                         </select>
